@@ -1,0 +1,5 @@
+name = "GMU Instagram"
+description = "GMU Instagram Feed Block"
+dependencies[] = block
+package = "GMU"
+core = 7.x

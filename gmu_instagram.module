@@ -1,0 +1,124 @@
+<?php
+
+function gmu_instagram_block_info(){
+    $blocks['instagram'] = array(
+        'info' => 'GMU Instagram',
+        'cache' => DRUPAL_NO_CACHE,
+
+    );
+    return $blocks;
+
+}
+
+/**
+ * Implements hook_theme().
+ */
+function gmu_instagram_theme($existing, $type, $theme, $path) {
+    if($type == 'module') {
+      return array(
+        'gmu_instagram_block' => array(
+          'template' => 'gmu-instagram-block',
+          'path' => "$path/theme",
+        ),
+      );
+    }
+    else {
+      return array();
+    }
+  }
+
+function gmu_instagram_block_configure($delta = ''){
+    $form = array();
+    switch($delta){
+        case 'instagram':
+            $form['profile_name'] = array(
+                '#title' => 'Instagram Profile Name',
+                '#type'  => 'textfield',
+                '#default_value' => variable_get('profile_name',''),
+                '#maxlength' => 255,
+                '#required' => TRUE,
+                '#description' => 'Enter Name of instagram'
+            );
+            $form['profile_full_name'] = array(
+                '#title' => 'Instagram Full Name',
+                '#type'  => 'textfield',
+                '#default_value' => variable_get('profile_full_name',''),
+                '#maxlength' => 255,
+                '#required' => TRUE,
+                '#description' => 'Enter Full Name of instagram'
+            );
+            $form['profile_image_url'] = array(
+                '#title' => 'Instagram Profile Image URL',
+                '#type'  => 'textfield',
+                '#default_value' => variable_get('profile_image_url',''),
+                '#maxlength' => 255,
+                '#required' => TRUE,
+                '#description' => 'Enter Profile Image URL of instagram'
+            );
+            $form['profile_url'] = array(
+                '#title' => 'Instagram Profile URL',
+                '#type'  => 'textfield',
+                '#default_value' => variable_get('profile_url',''),
+                '#maxlength' => 255,
+                '#required' => TRUE,
+                '#description' => 'Enter Profile URL of instagram'
+            );
+    }
+    return $form;
+}
+
+function gmu_instagram_block_save($delta = '', $edit = array()){
+    switch($delta){
+        case 'instagram':
+            variable_set('profile_name',$edit['profile_name']);
+            variable_set('profile_full_name',$edit['profile_full_name']);
+            variable_set('profile_image_url',$edit['profile_image_url']);
+            variable_set('profile_url',$edit['profile_url']);
+            break;
+    }
+}
+function gmu_instagram_block_view($delta = ''){
+    $block = array();
+    switch($delta){
+        case 'instagram' :
+            drupal_add_css(drupal_get_path('module', 'gmu_instagram') .'/css/styles.css');
+            drupal_add_js(array('instagram' => array('profile_name' => variable_get('profile_name'))),'setting');
+            drupal_add_js(drupal_get_path('module', 'gmu_instagram') . '/js/InstagramFeed.min.js');
+            drupal_add_js(drupal_get_path('module', 'gmu_instagram') . '/js/custom.js');
+            $block['subject'] = '';
+            $block['content'] =  gmu_instagram_block_content();
+            break;
+    }
+    return $block;
+}
+
+/**
+ * Implements hook_block_content().
+ */
+function gmu_instagram_block_content() {
+    
+    // Profile vars
+    $profile_name_var = variable_get('profile_name');
+    $profile_fullname_var = variable_get('profile_full_name');
+    $profile_profile_image_var = variable_get('profile_image_url');
+    $profile_profile_url_var = variable_get('profile_url');
+    
+    // Profile pic
+    $profile_pic = "<a href='".$profile_profile_url_var."'><img src='" .$profile_profile_image_var. "' alt='Instagram profile avatar' /></a>";
+
+    // Profile Full Name
+    $profile_full_name = $profile_fullname_var;
+
+    // Profile Name
+    $profile_name = $profile_name_var;
+
+    $vars = array(
+      'profile_pic' => $profile_pic,
+      'profile_full_name' => $profile_full_name,
+      'profile_name' => $profile_name,
+    );
+    $content = theme('gmu_instagram_block', $vars);
+  
+    return $content;
+
+  }
